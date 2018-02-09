@@ -19,6 +19,20 @@ function runTests() {
 		assertStringsEqual(false, "a", ""),
 		assertStringsEqual(false, "", "a"),
 		assertStringsEqual(false, "ab", "ax"),
+		assertEditStringA("", "", ""),
+		assertEditStringA("-", "a", ""),
+		assertEditStringA("--", "ab", ""),
+		assertEditStringA("+", "", "a"),
+		assertEditStringA("++", "", "ab"),
+		assertEditStringA("----===", "abcdxyz", "xyz"),
+		assertEditStringA("++++===", "xyz", "abcdxyz"),
+		assertEditStringA("----===-", "abcdxyzh", "xyz"),
+		assertEditStringA("----=-==-", "abcdxpyzh", "xyz"),
+		assertEditStringA("++++=+==+", "xyz", "abcdxpyzh"),
+		assertEditStringA("-+", "a", "b"),
+		assertEditStringA("-+==", "Axy", "Bxy"),
+		assertEditStringA("=-+=", "xAy", "xBy"),
+		assertEditStringA("==+", "aa", "aab"),
 	];
 	let summary = results.map(x => x[0] ? '.' : 'F').join("");
 	let failuredetails = results.filter(x => !x[0]).map(x => '\n' + x[1]).join("");
@@ -48,9 +62,16 @@ function assertStringsEqual(expected, a, b) {
 	return [expected == actual, message];
 }
 
+function assertEditStringA(expected, a, b) {
+	let actual = new Diff(a, b).editStringA;
+	let message = `Edit String from '${a}' to '${b}'. Expected [${expected}] but was [${actual}].`;
+	return [expected == actual, message];
+}
+
 function Diff(a, b) {
 	this.editMatrix = editMatrix(a, b);
 	this.areEqual = (0 == this.editMatrix[a.length][b.length]);
+	this.editStringA = editString(this.editMatrix);
 }
 
 function editMatrix(a, b) {
@@ -64,4 +85,27 @@ function editMatrix(a, b) {
 		for (var c = 1; c < cols; c++)
 			m[r][c] = Math.min(m[r-1][c-1], m[r][c-1], m[r-1][c]) + (a[r-1]==b[c-1] ? 0 : 1);
 	return m;
+}
+
+function editString(m) {
+	var r = m.length - 1;
+	var c = m[0].length - 1;
+	var result = "";
+	while ((r > 0) && (c > 0)) {
+		var nextStep = Math.min(m[r-1][c-1], m[r-1][c], m[r][c-1]);
+		if (m[r-1][c-1] == m[r][c] && m[r-1][c-1] == nextStep) {
+			result = "=" + result;
+			r--;
+			c--;
+		} else if (m[r-1][c] == nextStep) {
+			result = "-" + result;
+			r--;
+		} else {
+			result = "+" + result;
+			c--;
+		}
+	}
+	for (; r > 0; r--) result = "-" + result;
+	for (; c > 0; c--) result = "+" + result;
+	return result;
 }
