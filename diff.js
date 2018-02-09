@@ -11,6 +11,8 @@ function runTests() {
 		assertMatrix([[0,1,2],[1,0,1],[2,1,1]], "ab", "ac"),
 		assertMatrix([[0,1,2],[1,1,2],[2,2,1]], "ab", "xb"),
 		assertMatrix([[0,1,2],[1,1,2],[2,2,2]], "ab", "xy"),
+		assertMatrix([[0,1],[1, 0],[2,1]], "ab", "a"),
+		assertMatrix([[0,1,2],[1,0,1]], "a", "ab"),
 	];
 	let summary = results.map(x => x[0] ? '.' : 'F').join("");
 	let failuredetails = results.filter(x => !x[0]).map(x => '\n' + x[1]).join("");
@@ -41,10 +43,8 @@ function editMatrix(a, b) {
 	for (var r = 0; r < rows; r++) m[r] = new Array(cols);
 	for (var c = 0; c < cols; c++) m[0][c] = c;
 	for (var r = 1; r < rows; r++) m[r][0] = r;
-	for (var r = 1; r < rows; r++) {
-		for (var c = 1; c < cols; c++) {
+	for (var r = 1; r < rows; r++)
+		for (var c = 1; c < cols; c++)
 			m[r][c] = Math.min(m[r-1][c-1], m[r][c-1], m[r-1][c]) + (a[r-1]==b[c-1] ? 0 : 1);
-		}
-	}
 	return m;
 }
