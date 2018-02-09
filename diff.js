@@ -13,6 +13,12 @@ function runTests() {
 		assertMatrix([[0,1,2],[1,1,2],[2,2,2]], "ab", "xy"),
 		assertMatrix([[0,1],[1, 0],[2,1]], "ab", "a"),
 		assertMatrix([[0,1,2],[1,0,1]], "a", "ab"),
+		assertStringsEqual(true, "", ""),
+		assertStringsEqual(true, "a", "a"),
+		assertStringsEqual(true, "ab", "ab"),
+		assertStringsEqual(false, "a", ""),
+		assertStringsEqual(false, "", "a"),
+		assertStringsEqual(false, "ab", "ax"),
 	];
 	let summary = results.map(x => x[0] ? '.' : 'F').join("");
 	let failuredetails = results.filter(x => !x[0]).map(x => '\n' + x[1]).join("");
@@ -20,7 +26,7 @@ function runTests() {
 }
 
 function assertMatrix(expected, a, b) {
-	let actual = editMatrix(a, b);
+	let actual = new Diff(a, b).editMatrix;
 	let message = `Matrix for '${a}' and '${b}'. Expected [${expected.join("|")}] but was [${actual.join("|")}].`;
 	return [isMatrixEqual(expected, actual), message];
 }
@@ -34,6 +40,17 @@ function isMatrixEqual(a, b) {
 		}
 	}
 	return true;
+}
+
+function assertStringsEqual(expected, a, b) {
+	let actual = new Diff(a, b).areEqual;
+	let message = `Strings equal for '${a}' and '${b}'. Expected [${expected}] but was [${actual}].`;
+	return [expected == actual, message];
+}
+
+function Diff(a, b) {
+	this.editMatrix = editMatrix(a, b);
+	this.areEqual = (0 == this.editMatrix[a.length][b.length]);
 }
 
 function editMatrix(a, b) {
