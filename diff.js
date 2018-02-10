@@ -33,6 +33,13 @@ function runTests() {
 		assertEditStringA("-+==", "Axy", "Bxy"),
 		assertEditStringA("=-+=", "xAy", "xBy"),
 		assertEditStringA("==+", "aa", "aab"),
+		assertInDel("", "", ""),
+		assertInDel("={a}", "a", "a"),
+		assertInDel("={abc}", "abc", "abc"),
+		assertInDel("-{abc}", "abc", ""),
+		assertInDel("+{abc}", "", "abc"),
+		assertInDel("-{abc}+{xyz}", "abc", "xyz"),
+		assertInDel("-{ab}+{x}={123}-{c}+{yz}", "ab123c", "x123yz"),
 	];
 	let summary = results.map(x => x[0] ? '.' : 'F').join("");
 	let failuredetails = results.filter(x => !x[0]).map(x => '\n' + x[1]).join("");
@@ -68,10 +75,17 @@ function assertEditStringA(expected, a, b) {
 	return [expected == actual, message];
 }
 
+function assertInDel(expected, a, b) {
+	let actual = new Diff(a, b).inDel.map(x => `${x.operation}{${x.text}}`).join("");
+	let message = `In-Del from '${a}' to '${b}'. Expected [${expected}] but was [${actual}].`;
+	return [expected == actual, message];
+}
+
 function Diff(a, b) {
 	this.editMatrix = editMatrix(a, b);
 	this.areEqual = (0 == this.editMatrix[a.length][b.length]);
 	this.editStringA = editString(this.editMatrix);
+	this.inDel = inDel(a, b, this.editStringA);
 }
 
 function editMatrix(a, b) {
@@ -92,20 +106,52 @@ function editString(m) {
 	var c = m[0].length - 1;
 	var result = "";
 	while ((r > 0) && (c > 0)) {
-		var nextStep = Math.min(m[r-1][c-1], m[r-1][c], m[r][c-1]);
-		if (m[r-1][c-1] == m[r][c] && m[r-1][c-1] == nextStep) {
+		var nextStep = Math.min(m[r-1][c], m[r][c-1]);
+		if (m[r-1][c-1] == m[r][c] && m[r][c] <= nextStep) {
 			result = "=" + result;
 			r--;
 			c--;
-		} else if (m[r-1][c] == nextStep) {
-			result = "-" + result;
-			r--;
-		} else {
+		} else if (m[r][c-1] == nextStep) {
 			result = "+" + result;
 			c--;
+		} else {
+			result = "-" + result;
+			r--;
 		}
 	}
 	for (; r > 0; r--) result = "-" + result;
 	for (; c > 0; c--) result = "+" + result;
 	return result;
+}
+
+function inDel(a, b, editString) {
+	let as = a.split("");
+	let bs = b.split("");
+	let es = editString.split("");
+	result = [];
+	while (es.length > 0) {
+		var text = "";
+		while (es[0] == "=") {
+			text += as.shift();
+			es.shift();
+			bs.shift();
+		}
+		if (text.length > 0) result.push(new Edit("=", text));
+
+		var deletions = "";
+		var additions = "";
+		while (es.length > 0 && es[0] != "=") {
+			if (es[0] == "-") deletions += as.shift();
+			if (es[0] == "+") additions += bs.shift();
+		 	es.shift();
+		}
+		if (deletions.length > 0) result.push(new Edit("-", deletions));
+		if (additions.length > 0) result.push(new Edit("+", additions));
+	}
+	return result;
+}
+
+function Edit(operation, text) {
+	this.operation = operation;
+	this.text = text;
 }
