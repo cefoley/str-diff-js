@@ -194,3 +194,30 @@ function showDiff() {
 	let html = diffToHtml(new Diff(a, b));
 	document.getElementById("diff-result").innerHTML = html;
 }
+
+function ClearOnce(element) {
+	var shouldDo = true;
+	this.do = function() {
+		if (shouldDo) {
+			element.value = "";
+			shouldDo = false;
+		}
+	}
+}
+
+function clearOnceOnFocus(id) {
+	let element = document.getElementById(id);
+	element.onfocus = new ClearOnce(element).do;
+}
+
+function setUpUserInterface() {
+	clearOnceOnFocus("diff-from");
+	clearOnceOnFocus("diff-to");
+
+	document.getElementById("diff-show").onclick = showDiff;
+
+	showDiff();
+}
+
+setUpUserInterface();
+
