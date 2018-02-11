@@ -40,9 +40,18 @@ function runTests() {
 		assertInDel("+{abc}", "", "abc"),
 		assertInDel("-{abc}+{xyz}", "abc", "xyz"),
 		assertInDel("-{ab}+{x}={123}-{c}+{yz}", "ab123c", "x123yz"),
+		assertHtml('', "", ""),
+		assertHtml('<span class="same">a</span>', "a", "a"),
+		assertHtml('<span class="same">abc</span>', "abc", "abc"),
+		assertHtml('<span class="delete">abc</span>', "abc", ""),
+		assertHtml('<span class="insert">abc</span>', "", "abc"),
+		assertHtml('<span class="delete">ab</span><span class="insert">x</span>' 
+				 + '<span class="same">123</span><span class="delete">c</span>'
+				 + '<span class="insert">yz</span>', "ab123c", "x123yz"),
+		assertHtml('<span class="delete">&#38;</span><span class="insert">&#62;</span>', "&", ">"),
 	];
 	let summary = results.map(x => x[0] ? '.' : 'F').join("");
-	let failuredetails = results.filter(x => !x[0]).map(x => '\n' + x[1]).join("");
+	let failuredetails = results.filter(x => !x[0]).map(x => '\n' + htmlEncode(x[1])).join("");
 	return summary + failuredetails;
 }
 
@@ -78,6 +87,12 @@ function assertEditStringA(expected, a, b) {
 function assertInDel(expected, a, b) {
 	let actual = new Diff(a, b).inDel.map(x => `${x.operation}{${x.text}}`).join("");
 	let message = `In-Del from '${a}' to '${b}'. Expected [${expected}] but was [${actual}].`;
+	return [expected == actual, message];
+}
+
+function assertHtml(expected, a, b) {
+	let actual = diffToHtml(new Diff(a, b));
+	let message = `HTML for '${a}' to '${b}'. Expected [${expected}] but was [${actual}].`;
 	return [expected == actual, message];
 }
 
@@ -154,4 +169,21 @@ function inDel(a, b, editString) {
 function Edit(operation, text) {
 	this.operation = operation;
 	this.text = text;
+}
+
+function diffToHtml(diff) {
+	var result = "";
+	let toClass = { 
+		"-" : "delete", 
+		"+" : "insert",
+		"=" : "same"
+	};
+	for (e of diff.inDel) {
+		result += `<span class="${toClass[e.operation]}">${htmlEncode(e.text)}</span>`;
+	}
+	return result;
+}
+
+function htmlEncode(s) {
+	return s.replace(/[^a-zA-Z0-9 ]/g, c => `&#${c.charCodeAt(0)};`)
 }
