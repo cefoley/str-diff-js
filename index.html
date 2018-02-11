@@ -16,9 +16,9 @@
 		<h2>Text Diff</h2>
 		<form>
 			From:
-			<textarea id="diff-from"></textarea>
+			<textarea id="diff-from">This is a horrid hat.</textarea>
 			To:
-			<textarea id="diff-to"></textarea>
+			<textarea id="diff-to">This is a fabulous hat.</textarea>
 			<br>
 			<button type="button" onclick="showDiff()">Show Diff</button>
 		</form>
@@ -27,5 +27,6 @@
 		<pre id="diff-result">No diff has been run yet.</pre>
 
 		<script src="diff.js"></script>
+		<script>showDiff()</script>
 	</body>
 </html>
