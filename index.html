@@ -43,12 +43,16 @@
 				element.onfocus = new ClearOnce(element).do;
 			}
 
-			clearOnceOnFocus("diff-from");
-			clearOnceOnFocus("diff-to");
+			function setUpUserInterface() {
+				clearOnceOnFocus("diff-from");
+				clearOnceOnFocus("diff-to");
 
-			document.getElementById("diff-show").onclick = showDiff;
+				document.getElementById("diff-show").onclick = showDiff;
 
-			showDiff();
+				showDiff();
+			}
+
+			setUpUserInterface();
 		</script>
 	</body>
 </html>
