@@ -16,7 +16,7 @@
 		<h2>Text Diff</h2>
 		<form>
 			From:
-			<textarea id="diff-from">This is a horrid hat.</textarea>
+			<textarea id="diff-from" onfocus="clearOnce('diff-from')">This is a horrid hat.</textarea>
 			To:
 			<textarea id="diff-to">This is a fabulous hat.</textarea>
 			<br>
@@ -27,6 +27,15 @@
 		<pre id="diff-result">No diff has been run yet.</pre>
 
 		<script src="diff.js"></script>
-		<script>showDiff()</script>
+		<script>
+			var clearedTextArea = [];
+			function clearOnce(id) {
+				if (!clearedTextArea.includes(id) && true) {
+					clearedTextArea.push(id);
+					document.getElementById(id).value = "";
+				}
+			}
+			showDiff();
+		</script>
 	</body>
 </html>
