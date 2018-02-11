@@ -187,3 +187,10 @@ function diffToHtml(diff) {
 function htmlEncode(s) {
 	return s.replace(/[^a-zA-Z0-9 ]/g, c => `&#${c.charCodeAt(0)};`)
 }
+
+function showDiff() {
+	let a = document.getElementById("diff-from").value;
+	let b = document.getElementById("diff-to").value;
+	let html = diffToHtml(new Diff(a, b));
+	document.getElementById("diff-result").innerHTML = html;
+}

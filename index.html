@@ -3,10 +3,29 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Diff</title>
+		<style>
+			.delete {background-color: #e66;}
+			.insert {background-color: #4a4;}
+		</style>
 	</head>
 	<body>
-		<h1>Test Output</h1>
+		<h1>Diff</h1>
+		<h2>Test Output</h2>
 		<pre id="test-output">Not run yet...</pre>
+
+		<h2>Text Diff</h2>
+		<form>
+			From:
+			<textarea id="diff-from"></textarea>
+			To:
+			<textarea id="diff-to"></textarea>
+			<br>
+			<button type="button" onclick="showDiff()">Show Diff</button>
+		</form>
+
+		<h2>Diff Result</h2>
+		<pre id="diff-result">No diff has been run yet.</pre>
+
 		<script src="diff.js"></script>
 	</body>
 </html>
