@@ -1,4 +1,4 @@
-document.getElementById("test-output").innerHTML = runTests();
+// Tests
 
 function runTests() {
 	let results = [
@@ -96,6 +96,8 @@ function assertHtml(expected, a, b) {
 	return [expected == actual, message];
 }
 
+// Diff
+
 function Diff(a, b) {
 	this.editMatrix = editMatrix(a, b);
 	this.areEqual = (0 == this.editMatrix[a.length][b.length]);
@@ -178,7 +180,7 @@ function diffToHtml(diff) {
 		"+" : "insert",
 		"=" : "same"
 	};
-	for (e of diff.inDel) {
+	for (var e of diff.inDel) {
 		result += `<span class="${toClass[e.operation]}">${htmlEncode(e.text)}</span>`;
 	}
 	return result;
@@ -188,11 +190,26 @@ function htmlEncode(s) {
 	return s.replace(/[^a-zA-Z0-9 ]/g, c => `&#${c.charCodeAt(0)};`)
 }
 
-function showDiff() {
-	let a = document.getElementById("diff-from").value;
-	let b = document.getElementById("diff-to").value;
-	let html = diffToHtml(new Diff(a, b));
-	document.getElementById("diff-result").innerHTML = html;
+// User interface
+
+function setUpUserInterface() {
+	clearOnceOnFocus("diff-from");
+	clearOnceOnFocus("diff-to");
+
+	element("diff-show").onclick = showDiff;
+
+	element("test-output").innerHTML = runTests();
+
+	showDiff();
+}
+
+function element(id) {
+	return document.getElementById(id);
+}
+
+function clearOnceOnFocus(id) {
+	let e = element(id);
+	e.onfocus = new ClearOnce(e).do;
 }
 
 function ClearOnce(element) {
@@ -205,19 +222,13 @@ function ClearOnce(element) {
 	}
 }
 
-function clearOnceOnFocus(id) {
-	let element = document.getElementById(id);
-	element.onfocus = new ClearOnce(element).do;
+function showDiff() {
+	let a = element("diff-from").value;
+	let b = element("diff-to").value;
+	let html = diffToHtml(new Diff(a, b));
+	element("diff-result").innerHTML = html;
 }
 
-function setUpUserInterface() {
-	clearOnceOnFocus("diff-from");
-	clearOnceOnFocus("diff-to");
-
-	document.getElementById("diff-show").onclick = showDiff;
-
-	showDiff();
-}
+// Main
 
 setUpUserInterface();
-
