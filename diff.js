@@ -198,7 +198,7 @@ function setUpUserInterface() {
 
 	element("diff-show").onclick = showDiff;
 
-	element("test-output").innerHTML = runTests();
+	console.log("Test output: " + runTests());
 
 	showDiff();
 }

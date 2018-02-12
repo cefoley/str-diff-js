@@ -6,22 +6,47 @@
 		<style>
 			.delete {background-color: #e66;}
 			.insert {background-color: #4a4;}
+			.diff-text-areas {
+				display: flex;
+				margin: -4px;
+			}
+			.diff-input {
+				flex: 1;
+				margin: 4px;
+			}
+			textarea.diff {
+				width: 100%;
+				margin: 0 auto;
+				max-width: 100%;
+				box-sizing: border-box;
+				min-height: 7cm;
+				height: 50%;
+			}
+			#diff-show{
+				width: 100%;
+				height: 7em;
+			}
 		</style>
 	</head>
 	<body>
-		<h1>Diff</h1>
-		<h2>Test Output</h2>
-		<pre id="test-output">Not run yet...</pre>
+		<h1>What's the Diff?</h1>
+		<p>Enter two similar pieces of text. Push the button to see how to edit the text on the left to get the text on the right.</p>
 
-		<h2>Text Diff</h2>
-		<form>
-			From:
-			<textarea id="diff-from">This is a horrid hat.</textarea>
-			To:
-			<textarea id="diff-to">This is a fabulous hat.</textarea>
-			<br>
-			<button type="button" id="diff-show">Show Diff</button>
-		</form>
+		<div class="diff-text-areas">
+			<div class="diff-input">
+				<label for="diff-from">
+					From:<br>
+					<textarea class="diff" id="diff-from">This is a horrid hat.</textarea>
+				</label>
+			</div>
+			<div class="diff-input">
+				<label for="diff-to">
+					To:<br>
+					<textarea class="diff" id="diff-to">This is a fabulous hat.</textarea>
+				</label>
+			</div>
+		</div>
+		<button type="button" id="diff-show">Show Diff</button>
 
 		<h2>Diff Result</h2>
 		<pre id="diff-result">No diff has been run yet.</pre>
